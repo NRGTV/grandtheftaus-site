@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grand Theft Aus</title>
+<meta name="description" content="Grand Theft Aus: an open-world crime game set in Melbourne. Free roam, co-op story and six online servers hosted in Australia. Windows, macOS and Android.">
+<meta property="og:title" content="Grand Theft Aus">
+<meta property="og:description" content="Open-world Melbourne. Co-op story, deathmatch, zombies and contracts on Australian servers.">
+<meta property="og:image" content="https://grandtheftaus.online/img/city_1.jpg">
+<meta property="og:url" content="https://grandtheftaus.online/">
+<meta name="theme-color" content="#0e0b14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a screen-print poster - full-bleed duotone city plates, giant condensed type, each section takes one ink from the game's loading screens. */
+:root {
+  --ink: #0e0b14;          /* night, violet-biased black */
+  --ink-2: #17121f;        /* raised panels */
+  --line: #2c2438;
+  --paper: #f4f0f8;        /* text */
+  --muted: #a99fb8;
+  --hot: #ff4f8b;          /* MCG pink */
+  --bay: #3fd9b6;          /* bay teal */
+  --sun: #ffb347;          /* G orange */
+  --dusk: #8f72ff;         /* skyline violet */
+  --display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", Impact, sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --wrap: 1180px;
+  --gutter: clamp(16px, 4vw, 40px);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font: 400 1.0625rem/1.6 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
+h1, h2, h3 { font-family: var(--display); font-weight: 900; text-transform: uppercase; line-height: .9; letter-spacing: .005em; margin: 0; text-wrap: balance; }
+.eyebrow { font: 500 .78rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+/* ---- nav ---- */
+.nav {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.nav .wrap { display: flex; align-items: center; gap: 24px; min-height: 60px; }
+.mark { font: 900 1.45rem/1 var(--display); text-transform: uppercase; text-decoration: none; letter-spacing: .02em; white-space: nowrap; }
+.mark b { color: var(--hot); font-weight: 900; }
+.nav ul { display: flex; gap: 22px; list-style: none; margin: 0 0 0 auto; padding: 0; }
+.nav ul a { text-decoration: none; font-weight: 600; font-size: .95rem; color: var(--muted); }
+.nav ul a:hover { color: var(--paper); }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 800 1.15rem/1 var(--display); text-transform: uppercase; letter-spacing: .04em;
+  text-decoration: none; padding: 14px 22px; border: 2px solid var(--paper);
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--hot); }
+.btn-solid { background: var(--paper); color: var(--ink); }
+.btn-ghost { color: var(--paper); }
+.btn-sm { padding: 9px 14px; font-size: 1rem; }
+@media (max-width: 760px) { .nav ul { display: none; } .nav .btn-sm { margin-left: auto; } }
+
+/* ---- hero: the loading screen ---- */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); isolation: isolate; }
+.plates { position: absolute; inset: 0; z-index: -2; }
+.plates img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity 1.4s ease; transform: scale(1.04);
+}
+.plates img.on { opacity: 1; animation: drift 7s linear both; }
+.plates img:first-child { opacity: 1; }
+.plates.ready img:first-child:not(.on) { opacity: 0; }
+@keyframes drift { from { transform: scale(1.04); } to { transform: scale(1.1); } }
+.hero::before { /* halftone + vignette so type reads on every plate */
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background:
+    radial-gradient(circle at 1px 1px, rgba(14,11,20,.55) 1px, transparent 1.6px) 0 0 / 5px 5px,
+    linear-gradient(90deg, rgba(14,11,20,.92) 0%, rgba(14,11,20,.55) 48%, rgba(14,11,20,.1) 100%),
+    linear-gradient(0deg, rgba(14,11,20,.85) 0%, transparent 35%);
+}
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); align-items: end; gap: 24px; padding-block: clamp(56px, 9vw, 110px) 0; }
+.hero-copy { padding-bottom: clamp(48px, 7vw, 88px); min-width: 0; }
+.hero h1 { font-size: clamp(4.2rem, 13.5vw, 11.5rem); line-height: .8; }
+.hero h1 span { display: block; }
+.hero h1 .aus { color: var(--hot); -webkit-text-stroke: 0; text-shadow: 6px 6px 0 var(--ink); }
+.hero p.lede { font-size: clamp(1.1rem, 1.8vw, 1.3rem); max-width: 34ch; margin: 26px 0 30px; color: #e9e2f2; }
+.ctas { display: flex; flex-wrap: wrap; gap: 14px; }
+.platforms { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 26px; font: 500 .8rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.platforms span::before { content: "■ "; color: var(--bay); }
+.hero-char { align-self: end; justify-self: center; max-height: 640px; width: auto; filter: drop-shadow(0 18px 40px rgba(0,0,0,.6)); }
+.loadbar { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.08); }
+.loadbar i { display: block; height: 100%; width: 0; background: var(--hot); }
+.loadbar i.run { animation: load 7s linear both; }
+@keyframes load { to { width: 100%; } }
+.plate-tag { position: absolute; right: var(--gutter); bottom: 18px; font: 500 .72rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: rgba(244,240,248,.75); }
+@media (max-width: 820px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .hero-char { display: none; }
+  .hero::before { background:
+    radial-gradient(circle at 1px 1px, rgba(14,11,20,.55) 1px, transparent 1.6px) 0 0 / 5px 5px,
+    linear-gradient(0deg, rgba(14,11,20,.95) 10%, rgba(14,11,20,.5) 100%); }
+}
+@media (prefers-reduced-motion: reduce) { .plates img, .plates img.on { animation: none; transition: none; transform: none; } .loadbar i.run { animation: none; width: 100%; } }
+
+/* ---- sections ---- */
+section { padding-block: clamp(72px, 10vw, 128px); }
+.head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px 48px; align-items: end; margin-bottom: 48px; }
+.head h2 { font-size: clamp(3rem, 7.5vw, 6rem); }
+.head p { margin: 0; color: var(--muted); max-width: 46ch; }
+.head .eyebrow { grid-column: 1 / -1; }
+@media (max-width: 760px) { .head { grid-template-columns: 1fr; } }
+
+/* the city */
+.city h2 em { font-style: normal; color: var(--sun); }
+.tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.tile { position: relative; overflow: hidden; margin: 0; background: var(--ink-2); }
+.tile img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 16 / 10; transition: transform .6s ease; }
+.tile:hover img { transform: scale(1.05); }
+.tile figcaption { position: absolute; left: 0; bottom: 0; padding: 10px 14px; background: var(--ink); font: 800 1.15rem/1 var(--display); text-transform: uppercase; letter-spacing: .04em; }
+.tile:nth-child(1) { grid-column: span 4; grid-row: span 2; }
+.tile:nth-child(1) img { aspect-ratio: auto; }
+.tile:nth-child(2), .tile:nth-child(3) { grid-column: span 2; }
+.tile:nth-child(4), .tile:nth-child(5) { grid-column: span 3; }
+@media (max-width: 760px) { .tiles { grid-template-columns: 1fr 1fr; } .tile:nth-child(n) { grid-column: span 1; grid-row: auto; } .tile:nth-child(1) { grid-column: span 2; } .tile:nth-child(1) img { aspect-ratio: 16 / 10; } }
+
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 56px; border-top: 2px solid var(--paper); }
+.fact { padding: 22px 22px 0 0; min-width: 0; }
+.fact + .fact { padding-left: 22px; border-left: 1px solid var(--line); }
+.fact strong { display: block; font: 900 3.4rem/1 var(--display); color: var(--sun); font-variant-numeric: tabular-nums; }
+.fact span { display: block; margin-top: 8px; color: var(--muted); font-size: .97rem; }
+@media (max-width: 760px) { .facts { grid-template-columns: 1fr 1fr; } .fact:nth-child(3) { padding-left: 0; border-left: 0; } .fact { padding-bottom: 22px; } }
+
+/* online */
+.online { background: var(--ink-2); border-block: 1px solid var(--line); }
+.online h2 em { font-style: normal; color: var(--bay); }
+.servers { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--paper); }
+.server { display: grid; grid-template-columns: 210px minmax(0, 1fr) auto; gap: 8px 32px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.server .tag { font: 500 .75rem/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--bay); }
+.server h3 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+.server p { margin: 6px 0 0; color: var(--muted); max-width: 60ch; }
+.server .room { font: 500 .78rem/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.server:hover h3 { color: var(--bay); }
+@media (max-width: 760px) { .server { grid-template-columns: 1fr; } .server .room { white-space: normal; } }
+.note { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px 26px; font: 500 .8rem/1.4 var(--mono); letter-spacing: .06em; color: var(--muted); }
+.note span::before { content: "● "; color: var(--bay); }
+
+/* crew */
+.crew h2 em { font-style: normal; color: var(--hot); }
+.lineup { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: end; gap: 0; border-bottom: 2px solid var(--paper); background:
+  linear-gradient(0deg, color-mix(in srgb, var(--hot) 22%, transparent), transparent 70%); }
+.lineup figure { margin: 0; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.lineup img { width: 100%; height: clamp(180px, 30vw, 380px); object-fit: contain; object-position: bottom; transition: transform .25s ease; }
+.lineup figure:hover img { transform: translateY(-8px); }
+.lineup figcaption { width: 100%; text-align: center; padding: 12px 4px; background: var(--ink); border-top: 2px solid var(--paper); font: 800 1.25rem/1 var(--display); text-transform: uppercase; letter-spacing: .05em; }
+@media (max-width: 760px) { .lineup { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* trailers */
+.trailers h2 em { font-style: normal; color: var(--dusk); }
+.reels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.reel { text-decoration: none; display: block; }
+.reel .frame { position: relative; overflow: hidden; border: 2px solid var(--paper); }
+.reel img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; transition: transform .4s ease; }
+.reel:hover img { transform: scale(1.03); }
+.reel .play { position: absolute; inset: 0; display: grid; place-items: center; }
+.reel .play i { width: 76px; height: 76px; border-radius: 50%; background: var(--ink); border: 2px solid var(--paper); display: grid; place-items: center; transition: background .15s ease; }
+.reel .play i::after { content: ""; border-left: 22px solid var(--paper); border-block: 13px solid transparent; margin-left: 6px; }
+.reel:hover .play i { background: var(--dusk); }
+.reel h3 { font-size: 2rem; margin-top: 16px; }
+.reel span { font: 500 .78rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 760px) { .reels { grid-template-columns: 1fr; } }
+
+/* extras */
+.extras { padding-top: 0; }
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 2px solid var(--paper); }
+.col { padding: 26px 26px 0 0; min-width: 0; }
+.col + .col { padding-left: 26px; border-left: 1px solid var(--line); }
+.col h3 { font-size: 1.9rem; margin-bottom: 10px; }
+.col p { margin: 0; color: var(--muted); }
+.col .eyebrow { display: block; margin-bottom: 12px; color: var(--sun); }
+@media (max-width: 760px) { .cols { grid-template-columns: 1fr; } .col + .col { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); margin-top: 26px; } }
+
+/* download band */
+.band { position: relative; overflow: hidden; isolation: isolate; padding-block: clamp(80px, 11vw, 140px); border-top: 1px solid var(--line); }
+.band > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.band::before { content: ""; position: absolute; inset: 0; z-index: -1; background:
+  radial-gradient(circle at 1px 1px, rgba(14,11,20,.5) 1px, transparent 1.6px) 0 0 / 5px 5px,
+  linear-gradient(90deg, rgba(14,11,20,.9), rgba(14,11,20,.35)); }
+.band h2 { font-size: clamp(3.4rem, 9vw, 7.5rem); max-width: 12ch; }
+.band p { max-width: 42ch; margin: 22px 0 30px; font-size: 1.15rem; }
+
+footer { border-top: 1px solid var(--line); padding-block: 36px; color: var(--muted); font-size: .9rem; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 32px; justify-content: space-between; align-items: center; }
+footer p { margin: 0; max-width: 70ch; }
+footer nav { display: flex; flex-wrap: wrap; gap: 18px; }
+footer nav a { text-decoration: none; font-weight: 600; color: var(--paper); }
+footer nav a:hover { color: var(--hot); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="mark" href="#top">Grand Theft <b>Aus</b></a>
+    <ul>
+      <li><a href="#city">The city</a></li>
+      <li><a href="#online">Online</a></li>
+      <li><a href="#crew">The crew</a></li>
+      <li><a href="#trailers">Trailers</a></li>
+    </ul>
+    <a class="btn btn-solid btn-sm" href="https://f1ftycal.itch.io/grand-theft-aus" target="_blank" rel="noopener">Download</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-label="Grand Theft Aus" style="padding:0">
+    <div class="plates" id="plates">
+      <img src="img/city_1.jpg" alt="" data-tag="The G">
+      <img src="img/city_2.jpg" alt="" data-tag="The city" loading="lazy">
+      <img src="img/city_3.jpg" alt="" data-tag="The bay" loading="lazy">
+      <img src="img/city_6.jpg" alt="" data-tag="Bathing boxes" loading="lazy">
+      <img src="img/city_7.jpg" alt="" data-tag="High-rise" loading="lazy">
+      <img src="img/city_5.jpg" alt="" data-tag="Coast road" loading="lazy">
+      <img src="img/city_8.jpg" alt="" data-tag="Skyline" loading="lazy">
+      <img src="img/city_4.jpg" alt="" data-tag="The G" loading="lazy">
+    </div>
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">Open-world Melbourne · Out now</p>
+        <h1><span>Grand</span><span>Theft</span><span class="aus">Aus</span></h1>
+        <p class="lede">Run Melbourne your way. Steal a ride, catch a tram, play the story with your mates, or jump on six online servers hosted right here in Australia.</p>
+        <div class="ctas">
+          <a class="btn btn-solid" href="https://f1ftycal.itch.io/grand-theft-aus" target="_blank" rel="noopener">Get it on itch.io</a>
+          <a class="btn btn-ghost" href="#trailers">Watch the trailers</a>
+        </div>
+        <div class="platforms"><span>Windows</span><span>macOS</span><span>Android</span></div>
+      </div>
+      <img class="hero-char" src="img/cal.webp" alt="Cal walking" width="560" height="760">
+    </div>
+    <span class="plate-tag" id="plateTag" aria-hidden="true">Loading · The G</span>
+    <div class="loadbar" aria-hidden="true"><i id="bar"></i></div>
+  </section>
+
+  <section class="city" id="city">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">01 · The city</p>
+        <h2>All of Melbourne. <em>Yours.</em></h2>
+        <p>From the G to the bay, the city is built street by street. Trams run their routes, gum forest climbs the Dandenongs, and every car on the road is one you can take.</p>
+      </div>
+      <div class="tiles">
+        <figure class="tile"><img src="img/city_4.jpg" alt="The MCG in orange duotone" loading="lazy"><figcaption>The G</figcaption></figure>
+        <figure class="tile"><img src="img/city_6.jpg" alt="A row of beach bathing boxes" loading="lazy"><figcaption>Bathing boxes</figcaption></figure>
+        <figure class="tile"><img src="img/city_3.jpg" alt="The coastline and city skyline across the bay" loading="lazy"><figcaption>The bay</figcaption></figure>
+        <figure class="tile"><img src="img/city_7.jpg" alt="Apartment towers from above" loading="lazy"><figcaption>High-rise</figcaption></figure>
+        <figure class="tile"><img src="img/city_2.jpg" alt="City buildings at night" loading="lazy"><figcaption>The city</figcaption></figure>
+      </div>
+      <div class="facts">
+        <div class="fact"><strong>755</strong><span>gum trees across the Dandenong forest</span></div>
+        <div class="fact"><strong>6</strong><span>online servers, one Australian relay</span></div>
+        <div class="fact"><strong>254</strong><span>character animations, from cover vaults to the e-scooter</span></div>
+        <div class="fact"><strong>3</strong><span>platforms: Windows, macOS and Android</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="online" id="online">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">02 · Online</p>
+        <h2>Six servers. <em>Low ping.</em></h2>
+        <p>Every server runs on one relay hosted in Australia, so you're not lagging through Europe to play with the person down the road. Pick one from the in-game server list.</p>
+      </div>
+      <ul class="servers">
+        <li class="server"><span class="tag">Free roam</span><div><h3>AU · Free Roam</h3><p>The whole city with everyone in it. No rules beyond the ones the cops enforce.</p></div><span class="room">/freeroam</span></li>
+        <li class="server"><span class="tag">Deathmatch</span><div><h3>AU · Deathmatch</h3><p>Back-to-back deathmatches. Everyone's put straight in and the winner takes the payout.</p></div><span class="room">/deathmatch</span></li>
+        <li class="server"><span class="tag">Snipers</span><div><h3>AU · Snipers Only</h3><p>Sniper rifles and nothing else. Find a rooftop and stay patient.</p></div><span class="room">/sniper</span></li>
+        <li class="server"><span class="tag">Zombies</span><div><h3>AU · Undead of Melbourne</h3><p>Free roam with the zombies mod switched on for everyone. The locals have turned.</p></div><span class="room">/zombies</span></li>
+        <li class="server"><span class="tag">Contracts</span><div><h3>AU · Broker's Contracts</h3><p>The Broker posts a mark somewhere in the city. First player to close the hit gets paid.</p></div><span class="room">/contracts</span></li>
+        <li class="server"><span class="tag">Co-op story</span><div><h3>AU · Story Mode</h3><p>Play the story together on your own save. When one player starts a mission, it starts for everyone.</p></div><span class="room">/story</span></li>
+      </ul>
+      <div class="note"><span>Live player counts and ping show in the game's server list</span><span>Add friends and join their room in one click</span></div>
+    </div>
+  </section>
+
+  <section class="crew" id="crew">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">03 · The crew</p>
+        <h2>Meet the <em>locals.</em></h2>
+        <p>The faces you'll run into around Melbourne, on the job and off it.</p>
+      </div>
+      <div class="lineup">
+        <figure><img src="img/cal_mia.webp" alt="Cal and Mia" loading="lazy"><figcaption>Cal &amp; Mia</figcaption></figure>
+        <figure><img src="img/kobi.webp" alt="Kobi" loading="lazy"><figcaption>Kobi</figcaption></figure>
+        <figure><img src="img/macca.webp" alt="Macca" loading="lazy"><figcaption>Macca</figcaption></figure>
+        <figure><img src="img/local.webp" alt="A local in a beanie" loading="lazy"><figcaption>The local</figcaption></figure>
+        <figure><img src="img/cooper.webp" alt="Cooper" loading="lazy"><figcaption>Cooper</figcaption></figure>
+        <figure><img src="img/dave.webp" alt="Dave" loading="lazy"><figcaption>Dave</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="trailers" id="trailers">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">04 · Trailers</p>
+        <h2>See it <em>moving.</em></h2>
+        <p>Both trailers are on YouTube.</p>
+      </div>
+      <div class="reels">
+        <a class="reel" href="https://youtu.be/_pbaEXQRSzY" target="_blank" rel="noopener">
+          <div class="frame"><img src="img/trailer_thumb_nsew.jpg" alt="North South East West trailer thumbnail" loading="lazy"><span class="play"><i></i></span></div>
+          <h3>North · South · East · West</h3><span>Newest trailer · YouTube</span>
+        </a>
+        <a class="reel" href="https://youtu.be/n73A-Tai1YA" target="_blank" rel="noopener">
+          <div class="frame"><img src="img/trailer_thumb.jpg" alt="Launch trailer thumbnail" loading="lazy"><span class="play"><i></i></span></div>
+          <h3>Launch trailer</h3><span>YouTube</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="extras" aria-label="More">
+    <div class="wrap">
+      <div class="cols">
+        <div class="col"><span class="eyebrow">Always current</span><h3>Auto updates</h3><p>The launcher downloads each update for you, so you're always on the same version as the servers.</p></div>
+        <div class="col"><span class="eyebrow">Make it yours</span><h3>Mods</h3><p>Mods load straight into the game. Zombies and Bounty Hunter come built in, and you can add your own.</p></div>
+        <div class="col"><span class="eyebrow">$3 AUD a month</span><h3>Gun Pass</h3><p>Gold, neon, chrome, camo and inferno versions of the shop guns, plus new pass weapons as they're added.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-label="Download">
+    <img src="img/city_8.jpg" alt="" loading="lazy">
+    <div class="wrap">
+      <h2>The city's waiting.</h2>
+      <p>Download Grand Theft Aus from itch.io and play on Windows, macOS or Android.</p>
+      <a class="btn btn-solid" href="https://f1ftycal.itch.io/grand-theft-aus" target="_blank" rel="noopener">Get it on itch.io</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Grand Theft Aus is an independent game. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.</p>
+    <nav>
+      <a href="https://f1ftycal.itch.io/grand-theft-aus" target="_blank" rel="noopener">itch.io</a>
+      <a href="https://youtu.be/_pbaEXQRSzY" target="_blank" rel="noopener">YouTube</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var imgs = document.querySelectorAll('#plates img');
+  var bar = document.getElementById('bar');
+  var tag = document.getElementById('plateTag');
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!imgs.length) return;
+  var i = 0;
+  function show(n) {
+    imgs.forEach(function (im) { im.classList.remove('on'); });
+    void imgs[n].offsetWidth;
+    imgs[n].classList.add('on');
+    tag.textContent = 'Loading · ' + imgs[n].dataset.tag;
+    bar.classList.remove('run'); void bar.offsetWidth; bar.classList.add('run');
+  }
+  document.getElementById('plates').classList.add('ready');
+  show(0);
+  if (still) return;
+  setInterval(function () { i = (i + 1) % imgs.length; show(i); }, 7000);
+})();
+</script>
+</body>
+</html>
