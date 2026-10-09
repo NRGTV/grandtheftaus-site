@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Server Status · Grand Theft Aus</title>
+<meta name="description" content="Live status of the Grand Theft Aus online servers: who's on, in which room, right now.">
+<meta name="theme-color" content="#0e0b14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap">
+<link rel="preload" href="fonts/pricedown.woff" as="font" type="font/woff" crossorigin>
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="css/site.css">
+<style>
+:root { --up: #3fd9b6; --down: #ff5a5a; --wait: #a99fb8; }
+.nav ul a[aria-current="page"] { color: var(--paper); }
+
+.board { position: relative; overflow: hidden; isolation: isolate; border-bottom: 1px solid var(--line); padding-block: clamp(56px, 8vw, 96px) clamp(40px, 6vw, 64px); }
+.board > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.board::before { content: ""; position: absolute; inset: 0; z-index: -1; background:
+  radial-gradient(circle at 1px 1px, rgba(14,11,20,.55) 1px, transparent 1.6px) 0 0 / 5px 5px,
+  linear-gradient(90deg, rgba(14,11,20,.95), rgba(14,11,20,.6)); }
+.board h1 { font-size: clamp(3rem, 8vw, 6rem); }
+.overall { display: inline-flex; align-items: center; gap: 12px; margin-top: 22px; padding: 10px 18px; border: 2px solid currentColor; font: 400 1.5rem/1 var(--display); letter-spacing: .03em; color: var(--wait); }
+.overall i { width: 14px; height: 14px; border-radius: 50%; background: currentColor; }
+.overall[data-state="up"] { color: var(--up); }
+.overall[data-state="up"] i { animation: pulse 2s ease-in-out infinite; }
+.overall[data-state="down"] { color: var(--down); }
+@keyframes pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .overall i { animation: none !important; } }
+.updated { margin: 14px 0 0; color: var(--muted); font-size: .95rem; }
+
+.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--paper); margin-top: 36px; }
+.summary div { padding: 18px 18px 0 0; min-width: 0; }
+.summary div + div { padding-left: 18px; border-left: 1px solid var(--line); }
+.summary strong { display: block; font: 400 2.8rem/1 var(--display); color: var(--sun); font-variant-numeric: tabular-nums; }
+.summary span { display: block; margin-top: 6px; color: var(--muted); font-size: .95rem; }
+@media (max-width: 760px) { .summary { grid-template-columns: 1fr 1fr; } .summary div:nth-child(3) { padding-left: 0; border-left: 0; } .summary div { padding-bottom: 18px; } }
+
+.rooms { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--paper); }
+.room-row { display: grid; grid-template-columns: minmax(0, 1fr) 220px 150px; gap: 10px 28px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.room-row h3 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+.room-row p { margin: 4px 0 0; color: var(--muted); font-size: .95rem; }
+.meter { display: grid; gap: 8px; }
+.meter b { font: 400 1.5rem/1 var(--display); font-variant-numeric: tabular-nums; }
+.meter b small { font-size: 1rem; color: var(--muted); }
+.track { height: 8px; background: var(--line); }
+.track i { display: block; height: 100%; width: 0; background: var(--bay); transition: width .6s ease; }
+.chip { justify-self: end; display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid currentColor; font: 400 1.1rem/1 var(--display); letter-spacing: .03em; color: var(--wait); white-space: nowrap; }
+.chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.chip[data-state="up"] { color: var(--up); }
+.chip[data-state="busy"] { color: var(--sun); }
+.chip[data-state="down"] { color: var(--down); }
+@media (max-width: 760px) { .room-row { grid-template-columns: minmax(0, 1fr) auto; } .meter { grid-column: 1 / -1; grid-row: 2; } .chip { grid-column: 2; grid-row: 1; } }
+
+.help { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 40px; align-items: center; margin-top: 48px; padding: 28px; background: var(--ink-2); border: 1px solid var(--line); }
+.help h2 { font-size: 2.2rem; }
+.help p { margin: 8px 0 0; color: var(--muted); max-width: 56ch; }
+@media (max-width: 760px) { .help { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="mark" href="index.html"><img src="img/logo.png" alt="Grand Theft Aus" width="42" height="46"></a>
+    <ul>
+      <li><a href="index.html#city">The city</a></li>
+      <li><a href="index.html#online">Online</a></li>
+      <li><a href="index.html#trailers">Trailers</a></li>
+      <li><a href="status.html" aria-current="page">Server status</a></li>
+      <li><a href="https://discord.gg/K2Qsdkh7cU" target="_blank" rel="noopener">Discord</a></li>
+    </ul>
+    <a class="btn btn-solid btn-sm" href="https://f1ftycal.itch.io/grand-theft-aus" target="_blank" rel="noopener">Download</a>
+  </div>
+</header>
+
+<main>
+  <section class="board" style="padding-inline:0">
+    <img src="img/city_3.jpg" alt="">
+    <div class="wrap">
+      <p class="eyebrow">Australian relay · updates every 15 seconds</p>
+      <h1>Server status</h1>
+      <div class="overall" id="overall" data-state="wait" role="status" aria-live="polite"><i></i><span id="overallText">Checking the servers…</span></div>
+      <p class="updated" id="updated">Waiting for the first report from the relay.</p>
+      <div class="summary">
+        <div><strong id="sPlayers">–</strong><span>players online now</span></div>
+        <div><strong id="sUptime">–</strong><span>since the relay last restarted</span></div>
+        <div><strong id="sPeak">–</strong><span id="sPeakWhen">most players at once</span></div>
+        <div><strong id="sEver">–</strong><span>players have ever joined</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top: clamp(48px, 7vw, 80px)">
+    <div class="wrap">
+      <ul class="rooms" id="rooms">
+        <li class="room-row" data-room="freeroam"><div><h3>AU · Free Roam</h3><p>The whole city, everyone in it.</p></div><div class="meter"><b><span class="n">–</span> <small>/ 12</small></b><div class="track"><i></i></div></div><span class="chip" data-state="wait">Checking</span></li>
+        <li class="room-row" data-room="deathmatch"><div><h3>AU · Deathmatch</h3><p>Back-to-back deathmatches.</p></div><div class="meter"><b><span class="n">–</span> <small>/ 12</small></b><div class="track"><i></i></div></div><span class="chip" data-state="wait">Checking</span></li>
+        <li class="room-row" data-room="sniper"><div><h3>AU · Snipers Only</h3><p>Sniper rifles and nothing else.</p></div><div class="meter"><b><span class="n">–</span> <small>/ 12</small></b><div class="track"><i></i></div></div><span class="chip" data-state="wait">Checking</span></li>
+        <li class="room-row" data-room="zombies"><div><h3>AU · Undead of Melbourne</h3><p>Free roam with the zombies mod on.</p></div><div class="meter"><b><span class="n">–</span> <small>/ 12</small></b><div class="track"><i></i></div></div><span class="chip" data-state="wait">Checking</span></li>
+        <li class="room-row" data-room="contracts"><div><h3>AU · Broker's Contracts</h3><p>First to close the hit gets paid.</p></div><div class="meter"><b><span class="n">–</span> <small>/ 12</small></b><div class="track"><i></i></div></div><span class="chip" data-state="wait">Checking</span></li>
+        <li class="room-row" data-room="story"><div><h3>AU · Story Mode</h3><p>The story, co-op, on your own save.</p></div><div class="meter"><b><span class="n">–</span> <small>/ 12</small></b><div class="track"><i></i></div></div><span class="chip" data-state="wait">Checking</span></li>
+      </ul>
+
+      <div class="help">
+        <div>
+          <h2>Can't get in?</h2>
+          <p>Make sure the launcher has updated your game, then pick a server from the in-game list. If it's still not working, tell us on Discord.</p>
+        </div>
+        <a class="btn btn-solid" href="https://discord.gg/K2Qsdkh7cU" target="_blank" rel="noopener">Join the Discord</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Grand Theft Aus is an independent game. It is not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.</p>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="https://f1ftycal.itch.io/grand-theft-aus" target="_blank" rel="noopener">itch.io</a>
+      <a href="https://discord.gg/K2Qsdkh7cU" target="_blank" rel="noopener">Discord</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var URL = 'https://status.grandtheftaus.online/status.json';
+  var EVERY = 15000;
+  var STALE = 60; // seconds without a fresh report = the relay is down
+  var $ = function (id) { return document.getElementById(id); };
+  var last = null;
+
+  function ago(sec) {
+    if (sec < 5) return 'just now';
+    if (sec < 60) return sec + ' seconds ago';
+    var m = Math.round(sec / 60);
+    if (m < 60) return m + (m === 1 ? ' minute ago' : ' minutes ago');
+    var h = Math.round(m / 60);
+    return h + (h === 1 ? ' hour ago' : ' hours ago');
+  }
+  function span(sec) {
+    var d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60);
+    if (d) return d + 'd ' + h + 'h';
+    if (h) return h + 'h ' + m + 'm';
+    return m + 'm';
+  }
+  function setOverall(state, text) {
+    $('overall').dataset.state = state;
+    $('overallText').textContent = text;
+  }
+  function setRooms(fn) {
+    document.querySelectorAll('.room-row').forEach(function (row) { fn(row, row.dataset.room); });
+  }
+
+  function render(s) {
+    var now = Date.now() / 1000;
+    var age = Math.max(0, Math.round(now - s.updated));
+    var up = age <= STALE;
+    var max = s.max_per_room || 12;
+    var byId = {};
+    (s.rooms || []).forEach(function (r) { byId[r.id] = r; });
+
+    if (up) setOverall('up', s.players > 0 ? 'All servers up · ' + s.players + ' playing' : 'All servers up');
+    else setOverall('down', 'Servers offline');
+    $('updated').textContent = up ? 'Last report from the relay ' + ago(age) + '.' : 'No report from the relay for ' + ago(age).replace(' ago', '') + '. It may be restarting.';
+
+    $('sPlayers').textContent = up ? s.players : 0;
+    $('sUptime').textContent = up && s.started ? span(now - s.started) : '–';
+    $('sPeak').textContent = s.peak || 0;
+    $('sPeakWhen').textContent = s.peak_at ? 'most at once, ' + new Date(s.peak_at * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : 'most players at once';
+    $('sEver').textContent = s.ever || 0;
+
+    setRooms(function (row, id) {
+      var r = byId[id];
+      var n = up && r ? r.players : 0;
+      row.querySelector('.n').textContent = up ? n : '–';
+      row.querySelector('.track i').style.width = Math.min(100, n / max * 100) + '%';
+      var chip = row.querySelector('.chip');
+      var state = 'up', label = 'Online';
+      if (!up || !r) { state = 'down'; label = 'Offline'; }
+      else if (n >= max) { state = 'busy'; label = 'Full'; }
+      else if (id === 'deathmatch' && s.deathmatch_running) { state = 'busy'; label = 'Match on'; }
+      else if (id === 'contracts' && s.contract_running) { state = 'busy'; label = 'Hit posted'; }
+      chip.dataset.state = state;
+      chip.textContent = label;
+    });
+  }
+
+  function unreachable() {
+    if (last) { render(last); return; }
+    setOverall('down', "Can't reach the servers");
+    $('updated').textContent = "The status service didn't answer. The servers may be down, or your connection may be blocking it.";
+    setRooms(function (row) {
+      var chip = row.querySelector('.chip');
+      chip.dataset.state = 'down'; chip.textContent = 'Unknown';
+    });
+  }
+
+  function poll() {
+    fetch(URL + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (s) { last = s; render(s); })
+      .catch(unreachable);
+  }
+  poll();
+  setInterval(poll, EVERY);
+  setInterval(function () { if (last) render(last); }, 5000); // keep "x seconds ago" honest between polls
+})();
+</script>
+</body>
+</html>
